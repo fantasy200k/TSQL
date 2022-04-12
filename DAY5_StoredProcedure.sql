@@ -150,30 +150,156 @@ group by deptno
 
 END;
 
-
+USE Sales
+go
 
 EXECUTE deptSal
 
 DROP PROCEDURE deptSal
+/* 
+Store procedure can have 0 or more INPUT and OUTPUT parameters
 
-CREATE PROCEDURE deptSal(@deptno1 INT = NULL, @jb1 VARCHAR(20) = NULL)
+A stored procedure can have a maximum of 2100 parameters specified
+
+You can specify a default value for the parameters 
+
+The stored procedre parameter names must start with @
+
+*/
+CREATE PROCEDURE deptSal
+ (
+	@deptno1 INT , 
+	@jb1 VARCHAR(20) = 'MANAGER'
+	)
 AS
 BEGIN
-SELECT deptno,sum(sal) 
+SELECT deptno,sum(sal)
 FROM emp
-WHERE deptno = @deptno1 and job = 
+WHERE deptno = @deptno1 and job = @jb1
 group by deptno
 
+END;
+
+
+EXECUTE deptSal @deptno1=20, @jb1='ANALYST'
+
+CREATE PROCEDURE deptSal
+ (
+	@deptno1 INT , 
+	@jb1 VARCHAR(20) = 'MANAGER'
+	)
+AS
+BEGIN
+SELECT deptno,sum(sal)
+FROM emp
+WHERE deptno = @deptno1 and job = @jb1
+group by deptno
+
+END;
+/*
+*/
+
+CREATE PROCEDURE upddeptSal
+ (
+	@sal INT , 
+	@empno INT
+	)
+AS
+BEGIN
+UPDATE emp
+SET sal = @sal WHERE empno = @empno
 
 
 END;
 
-EXECUTE deptSal 20 'MANAGER'
+EXECUTE upddeptSal  @sal=5000 , @empno=7369
+
+EXECUTE upddeptSal  @empno=7369, @sal=5000 
+
+EXECUTE upddeptSal 5000 , 7369
+
+/* INPUT and OUTPUT parameter */
+
+CREATE PROCEDURE ViewdeptSal
+ (
+    @empno INT ,
+	@job varchar(15) OUTPUT 
+	
+	)
+AS
+BEGIN
+
+SELECT @job=job
+FROM emp
+WHERE empno = @empno
+
+END;
+
+DECLARE @job varchar(15)
+EXECUTE ViewdeptSal @empno = 7369, @job OUTPUT
+PRINT @job
+
+
+/* How to create a FUNCTION ?  What is a function ?? 
+CREATE FUNCTION function_name (input parameters)
+RETURNS return_type
+AS
+	SQL Statements
+    RETURN return_value
+GO
+There are 2 types of function 
+(a) Scalar Function
+(b) Table function
+*/
+
+CREATE FUNCTION getEmpInfo()
+RETURNS TABLE
+AS
+	    RETURN (SELECT * FROM emp)
+GO
+
+
+SELECT * FROM getEmpInfo()
+
+CREATE FUNCTION FindMax()
+RETURNS int
+AS
+BEGIN
+DECLARE @a int = 10,
+	    @b int = 5,
+		@c int = 20
+IF (@a > @c)
+	SET @a = @b
+ELSE 
+	 SET @a = @c
+RETURN @a
+END
+
+SELECT dbo.FindMax() as MaxValue
+
+/* Difference between Stored Procedure and Function ?
+A function must return always a value whereas a procedure may or may not return value
+
+Functon works only with input parameters whereas in a procedure we can use input as well as output
+parameter
+
+We can call functios within a SQL Statement , we cannt use procedres within a SQL Statement
+
+*/
+
+
+
+
+
 
 /* Hadoop software java */
+
 
 exec sp_who2 'active'
 
 		select * from emp order by empno
 		insert into emp values (7370,'ROBERT','Analyst',NULL, NULL, 5000,1000, 30)
 		
+
+
+		select * from emp
